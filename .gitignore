@@ -1,0 +1,7 @@
+dependency-reduced-pom.xml hs_err_pid4690.log ssp-sp-enricher.iml target/
+hs_err*.log
+*.iml
+/.idea
+/dependency-reduced-pom.xml
+/target
+
