@@ -3,6 +3,7 @@ package br.ufsc.lapesd.sspsp;
 import br.com.ivansalvadori.ssp.sp.cleaner.BoletimOcorrencia;
 import br.ufsc.lapesd.sspsp.enricher.BoletimOcorrenciaEnricher;
 import br.ufsc.lapesd.sspsp.enricher.NamedEnricher;
+import br.ufsc.lapesd.sspsp.enricher.PermanentEnricherException;
 import br.ufsc.lapesd.sspsp.sink.EnrichmentSink;
 import com.google.common.base.Charsets;
 import com.google.common.reflect.ClassPath;
@@ -15,7 +16,6 @@ import org.kohsuke.args4j.Option;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,12 +42,12 @@ public class App {
         try {
             parser.parseArgument(args);
             app.run();
-        } catch (CmdLineException e) {
+        } catch (CmdLineException | PermanentEnricherException e) {
             e.printStackTrace();
         }
     }
 
-    private void run() {
+    private void run() throws PermanentEnricherException {
         BoletimOcorrenciaEnricher enricher = setupEnricher();
         if (enricher == null) return;
 
@@ -99,7 +99,7 @@ public class App {
     }
 
     private void processBO(BoletimOcorrenciaEnricher enricher,
-                           EnrichmentSink sink, File file) {
+                           EnrichmentSink sink, File file) throws PermanentEnricherException {
         BoletimOcorrencia bo = null;
         try {
             FileInputStream stream = new FileInputStream(file);
@@ -114,6 +114,8 @@ public class App {
                 sink.offerEnrichment(bo, enricher.enrich(bo));
 
             }
+        } catch (PermanentEnricherException e) {
+            throw e;
         } catch (Exception e) {
             System.err.printf("Exception while enriching BO %1$s: %2$s\n", bo.getIdBO(),
                     e.getMessage());

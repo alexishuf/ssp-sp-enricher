@@ -4,6 +4,7 @@ import br.com.ivansalvadori.ssp.sp.cleaner.BoletimOcorrencia;
 import br.ufsc.lapesd.sspsp.cache.JsonCacheDir;
 import br.ufsc.lapesd.sspsp.enricher.BoletimOcorrenciaEnricher;
 import br.ufsc.lapesd.sspsp.enricher.NamedEnricher;
+import br.ufsc.lapesd.sspsp.enricher.PermanentEnricherException;
 import br.ufsc.lapesd.sspsp.sink.BoletimOcorrenciaJsonSink;
 import br.ufsc.lapesd.sspsp.sink.EnrichmentSink;
 import com.google.appengine.repackaged.com.google.api.client.util.Charsets;
@@ -12,11 +13,11 @@ import com.google.common.base.Preconditions;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.GeocodingApiRequest;
+import com.google.maps.errors.OverQueryLimitException;
 import com.google.maps.model.GeocodingResult;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -67,8 +68,12 @@ public class GeocodingEnricher implements BoletimOcorrenciaEnricher<GeocodingRes
             if (cached != null) return cached;
         }
         GeocodingApiRequest request = GeocodingApi.geocode(apiContext, bo.getLocal());
-        GeocodingResult[] results = request.await();
-        return new GeocodingResultContainer(results);
+        try {
+            GeocodingResult[] results = request.await();
+            return new GeocodingResultContainer(results);
+        } catch (OverQueryLimitException ex) {
+            throw new PermanentEnricherException(ex.getMessage(), ex);
+        }
     }
 
     @Override
