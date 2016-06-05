@@ -64,7 +64,7 @@
     <dependency>
       <groupId>br.com.ivansalvadori</groupId>
       <artifactId>ssp-sp-cleaner</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.maps</groupId>

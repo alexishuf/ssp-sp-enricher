@@ -72,7 +72,9 @@ public class GeocodingEnricher implements BoletimOcorrenciaEnricher<GeocodingRes
         GeocodingApiRequest request = GeocodingApi.geocode(apiContext, bo.getLocal());
         try {
             GeocodingResult[] results = request.await();
-            return new GeocodingResultContainer(results);
+            GeocodingResultContainer container = new GeocodingResultContainer(results);
+            cache.save(bo, container);
+            return container;
         } catch (OverQueryLimitException ex) {
             throw new PermanentEnricherException(ex.getMessage(), ex);
         }
