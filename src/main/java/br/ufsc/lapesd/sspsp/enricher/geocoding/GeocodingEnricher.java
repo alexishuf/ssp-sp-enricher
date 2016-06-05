@@ -63,6 +63,8 @@ public class GeocodingEnricher implements BoletimOcorrenciaEnricher<GeocodingRes
 
     @Override
     public GeocodingResultContainer enrich(BoletimOcorrencia bo) throws Exception {
+        if (bo.getLocal() == null) return null;
+
         if (cache != null) {
             GeocodingResultContainer cached = cache.fetch(bo, GeocodingResultContainer.class);
             if (cached != null) return cached;

@@ -111,7 +111,9 @@ public class App {
         }
         try {
             if (bo != null) {
-                sink.offerEnrichment(bo, enricher.enrich(bo));
+                Object enrichment = enricher.enrich(bo);
+                if (enrichment != null)
+                    sink.offerEnrichment(bo, enrichment);
 
             }
         } catch (PermanentEnricherException e) {
